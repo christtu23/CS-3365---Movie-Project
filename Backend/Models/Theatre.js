@@ -63,4 +63,5 @@ const TheatreSchema = new db.Schema({
     },
 });
 
+TheatreSchema.index({ location: '2dsphere' });
 module.exports = db.model('Theatre',TheatreSchema)

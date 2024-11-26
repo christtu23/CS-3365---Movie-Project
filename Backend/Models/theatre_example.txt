@@ -1,0 +1,24 @@
+{
+  "name": "Cineplex 42",
+  "location": {
+    "type": "Point",
+    "coordinates": [-122.4194, 37.7749] // Example coordinates for San Francisco
+  },
+  "contactInfo": {
+    "phone": "+15551234567",
+    "email": "info@cineplex42.com"
+  },
+  "hours": [
+    {
+      "dayOfWeek": "Monday",
+      "openHours": "2024-11-25T09:00:00Z",  // 9:00 AM UTC Monday
+      "closeHours": "2024-11-25T21:00:00Z"  // 9:00 PM UTC Monday
+    },
+    {
+      "dayOfWeek": "Tuesday",
+      "openHours": "2024-11-26T10:00:00Z",  // 10:00 AM UTC Tuesday
+      "closeHours": "2024-11-26T22:00:00Z"  // 10:00 PM UTC Tuesday
+    }
+  ],
+  "screens": 5
+}

@@ -4,21 +4,29 @@
 /*===================================Variables & References ================================*/
 const express = require("express") //Import Express (Handles the web-server)
 require('dotenv').config(); /* Loads Env variables into process.env pretty much just a process obfuscation layer */
+const cors = require("cors") // For cross-origin requests 
 const app = express(); //Initializes The App
 const defaultPort = 5000
 const PORT = process.env.PORT || defaultPort;
 
 /*Import Routes*/
 const movieRoutes = require('./Routes/Movies'); // Import movie routes
-
+const showtimeRoutes = require('/Routes/Showtime')
+const theatreRoutes = require('./Routes/Theatre'); // Import movie routes
+const UserRoutes = require('/Routes/User')
 
 /*===================================API MOUNTS================================*/
 app.use(express.json()); //This will automatically parse incoming request as JSON'S
+app.use(cors());
+
 /* Hearbeat Check */
 app.get("/",(req,res) => {res.send('Movie Booking API is Active...')})
 
 /* Movies API */
 app.use("/api/movies",movieRoutes)
+app.use("/api/showtimes",showtimeRoutes)
+app.use("/api/theatre",theatreRoutes)
+app.use("/api/user",UserRoutes)
 
 /* Debug */
 app.use((req, res, next) => {
