@@ -7,14 +7,10 @@ const TheatreSchema = new db.Schema({
         type:String,
         required:true,
     },
-    location:{ //-> GeoJson Format
-        type: {
-            type:String,
-            enum:['Point'],
-        },
-        coordinates: { // [Longitude, Latitude]
-            type:[Number],
-        }
+    location: { //-> A list of possible locations
+        type: [String], // Array of strings to represent different locations
+        enum: ['NorthOverton', 'WestLake', 'Downtown', 'SouthPark', 'EastSide'], // List of predefined locations
+        required: true,
     },
     contactInfo:{ //-> Regix Verified
         phone: {
@@ -63,5 +59,4 @@ const TheatreSchema = new db.Schema({
     },
 });
 
-TheatreSchema.index({ location: '2dsphere' });
 module.exports = db.model('Theatre',TheatreSchema)
