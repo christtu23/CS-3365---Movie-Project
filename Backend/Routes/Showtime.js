@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const showtimesController = require('../controllers/showtimes');
+const showtimesController = require('../Controllers/ShowtimeController');
 const { default: mongoose } = require('mongoose');
+
+//Tried a new format here, that cleans things up a bit. The functionality is the same
 
 // Create a new showtime
 router.post('/', showtimesController.CreateShowtime);
@@ -24,7 +26,7 @@ router.get('/movie/:movieId/date/:date', async(req, res) =>{
     if(!mongoose.Types.ObjectId.isValid(movieId)){
         return res.status(400).json({ message: '[X][MBS]: Invalid movie ID' });
     }
-    
+
     showtimesController.GetShowtimesByMovieAndDate(req,res);
 });
 

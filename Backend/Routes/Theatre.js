@@ -1,7 +1,7 @@
 /* Variables & References */
 const express = require('express');
 const router = express.Router();
-const { CreateTheatre, GetAllTheatres, GetTheatreById,UpdateTheatre,DeleteTheatre } = require('./Controllers/TheatreController');
+const { CreateTheatre, GetAllTheatres, GetTheatreById,UpdateTheatre,DeleteTheatre } = require('../Controllers/TheatreController');
 
 //Create Theatre
 router.post('/', CreateTheatre);
@@ -10,7 +10,7 @@ router.post('/', CreateTheatre);
 router.get('/', GetAllTheatres);
 
 //Get Theatre By Id
-router.get('/', GetTheatreById);
+router.get('/:id', GetTheatreById);
 
 //Update Theatre
 router.put('/:id', UpdateTheatre)
@@ -18,3 +18,4 @@ router.put('/:id', UpdateTheatre)
 //Delete Theatre
 router.delete('/:id', DeleteTheatre)
 
+module.exports = router;

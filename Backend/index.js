@@ -11,9 +11,9 @@ const PORT = process.env.PORT || defaultPort;
 
 /*Import Routes*/
 const movieRoutes = require('./Routes/Movies'); // Import movie routes
-const showtimeRoutes = require('/Routes/Showtime')
+const showtimeRoutes = require('./Routes/Showtime')
 const theatreRoutes = require('./Routes/Theatre'); // Import movie routes
-const UserRoutes = require('/Routes/User')
+const UserRoutes = require('./Routes/User')
 
 /*===================================API MOUNTS================================*/
 app.use(express.json()); //This will automatically parse incoming request as JSON'S
