@@ -2,30 +2,31 @@ openapi: 3.0.0
 info:
   title: Movie Booking API
   version: 1.0.0
-  description: API documentation for the Movie Booking System.
+  description: Comprehensive API documentation for the Movie Booking System.
+
 servers:
   - url: http://localhost:5000
     description: Development server
 
 tags:
   - name: Movies
-    description: Movie management
+    description: Endpoints for managing movies
   - name: Showtimes
-    description: Showtime management
+    description: Endpoints for managing showtimes
   - name: Theatres
-    description: Theatre management
+    description: Endpoints for managing theatres
   - name: Users
-    description: User management and authentication
+    description: Endpoints for user registration, authentication, and actions
 
 paths:
   /api/movies:
     get:
-      summary: Retrieve all movies
+      summary: Get all movies
       tags:
         - Movies
       responses:
         200:
-          description: List of movies
+          description: A list of movies
           content:
             application/json:
               schema:
@@ -70,7 +71,7 @@ paths:
         404:
           description: Movie not found
     put:
-      summary: Update a movie
+      summary: Update a movie by ID
       tags:
         - Movies
       parameters:
@@ -92,7 +93,7 @@ paths:
         404:
           description: Movie not found
     delete:
-      summary: Delete a movie
+      summary: Delete a movie by ID
       tags:
         - Movies
       parameters:
@@ -110,12 +111,12 @@ paths:
 
   /api/showtimes:
     get:
-      summary: Retrieve all showtimes
+      summary: Get all showtimes
       tags:
         - Showtimes
       responses:
         200:
-          description: List of showtimes
+          description: A list of showtimes
           content:
             application/json:
               schema:
@@ -123,7 +124,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/Showtime'
     post:
-      summary: Add a new showtime
+      summary: Create a new showtime
       tags:
         - Showtimes
       requestBody:
@@ -160,7 +161,7 @@ paths:
         404:
           description: Showtime not found
     put:
-      summary: Update a showtime
+      summary: Update a showtime by ID
       tags:
         - Showtimes
       parameters:
@@ -182,7 +183,7 @@ paths:
         404:
           description: Showtime not found
     delete:
-      summary: Delete a showtime
+      summary: Delete a showtime by ID
       tags:
         - Showtimes
       parameters:
@@ -197,6 +198,164 @@ paths:
           description: Showtime deleted successfully
         404:
           description: Showtime not found
+
+  /api/showtimes/movie/{movieId}/date/{date}:
+    get:
+      summary: Get showtimes by a specific movie and date
+      tags:
+        - Showtimes
+      parameters:
+        - name: movieId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The ID of the movie
+        - name: date
+          in: path
+          required: true
+          schema:
+            type: string
+            format: date
+          description: The date of the showtime in YYYY-MM-DD format
+      responses:
+        200:
+          description: List of showtimes for the specified movie and date
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Showtime'
+        400:
+          description: Invalid movie ID or other validation errors
+        404:
+          description: No showtimes found for the specified criteria
+
+  /api/showtimes/book:
+    post:
+      summary: Book a seat for a showtime
+      tags:
+        - Showtimes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                showtimeId:
+                  type: string
+                  description: ID of the showtime to book
+                  example: "64b9f4e7b9d17c001ed3c8f2"
+                seatNumber:
+                  type: string
+                  description: Seat number to be booked
+                  example: "A10"
+                userId:
+                  type: string
+                  description: ID of the user making the booking
+                  example: "648f4d6b9f2b500123f78abc"
+              required:
+                - showtimeId
+                - seatNumber
+      responses:
+        200:
+          description: Booking successful
+        400:
+          description: Invalid data or validation errors
+        404:
+          description: Showtime not found
+
+  /api/theatre:
+    get:
+      summary: Get all theatres
+      tags:
+        - Theatres
+      responses:
+        200:
+          description: A list of theatres
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Theatre'
+    post:
+      summary: Create a new theatre
+      tags:
+        - Theatres
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Theatre'
+      responses:
+        201:
+          description: Theatre created successfully
+        400:
+          description: Validation error
+
+  /api/theatre/{id}:
+    get:
+      summary: Get a theatre by ID
+      tags:
+        - Theatres
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The ID of the theatre
+      responses:
+        200:
+          description: Theatre details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Theatre'
+        404:
+          description: Theatre not found
+    put:
+      summary: Update a theatre by ID
+      tags:
+        - Theatres
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The ID of the theatre
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Theatre'
+      responses:
+        200:
+          description: Theatre updated successfully
+        404:
+          description: Theatre not found
+    delete:
+      summary: Delete a theatre by ID
+      tags:
+        - Theatres
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The ID of the theatre
+      responses:
+        204:
+          description: Theatre deleted successfully
+        404:
+          description: Theatre not found
 
   /api/user/register:
     post:
@@ -217,7 +376,7 @@ paths:
 
   /api/user/login:
     post:
-      summary: Authenticate a user
+      summary: Login a user
       tags:
         - Users
       requestBody:
@@ -228,71 +387,36 @@ paths:
               $ref: '#/components/schemas/UserLogin'
       responses:
         200:
-          description: Authentication successful
+          description: Login successful
         401:
-          description: Invalid credentials
+          description: Unauthorized
 
-components:
-  schemas:
-    Movie:
-      type: object
-      properties:
-        title:
-          type: string
-        description:
-          type: string
-        releaseDate:
-          type: string
-          format: date
-        genre:
-          type: string
-        director:
-          type: string
-        cast:
-          type: array
-          items:
-            type: string
-    Showtime:
-      type: object
-      properties:
-        movie:
-          type: string
-        theatre:
-          type: string
-        pricing:
-          type: number
-        language:
-          type: string
-        showDates:
-          type: array
-          items:
-            type: object
-            properties:
-              date:
-                type: string
-                format: date
-              times:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    startTime:
-                      type: string
-                    endTime:
-                      type: string
-    UserRegistration:
-      type: object
-      properties:
-        name:
-          type: string
-        email:
-          type: string
-        password:
-          type: string
-    UserLogin:
-      type: object
-      properties:
-        email:
-          type: string
-        password:
-          type: string
+  /api/user/profile:
+    get:
+      summary: Get user profile
+      tags:
+        - Users
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: User profile data
+        401:
+          description: Unauthorized
+    put:
+      summary: Update user profile
+      tags:
+        - Users
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserProfile'
+      responses:
+        200:
+          description: Profile updated successfully
+        401:
+          description: Unauthorized
