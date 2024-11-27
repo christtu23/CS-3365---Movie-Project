@@ -3,6 +3,9 @@
 
 /*===================================Variables & References ================================*/
 const express = require("express") //Import Express (Handles the web-server)
+const swaggerUi = require('swagger-ui-express'); //Swagger Addition for API documentation
+const YAML = require('yamljs'); //Loads our swagger yaml file
+const swaggerDoc = YAML.load('./Docs/swagger.yaml') //Loads our doumentation yaml
 require('dotenv').config(); /* Loads Env variables into process.env pretty much just a process obfuscation layer */
 const cors = require("cors") // For cross-origin requests 
 const app = express(); //Initializes The App
@@ -27,6 +30,9 @@ app.use("/api/movies",movieRoutes)
 app.use("/api/showtimes",showtimeRoutes)
 app.use("/api/theatre",theatreRoutes)
 app.use("/api/user",UserRoutes)
+
+/* Swagger Documentation */
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc));
 
 /* Debug */
 app.use((req, res, next) => {

@@ -1,0 +1,298 @@
+openapi: 3.0.0
+info:
+  title: Movie Booking API
+  version: 1.0.0
+  description: API documentation for the Movie Booking System.
+servers:
+  - url: http://localhost:5000
+    description: Development server
+
+tags:
+  - name: Movies
+    description: Movie management
+  - name: Showtimes
+    description: Showtime management
+  - name: Theatres
+    description: Theatre management
+  - name: Users
+    description: User management and authentication
+
+paths:
+  /api/movies:
+    get:
+      summary: Retrieve all movies
+      tags:
+        - Movies
+      responses:
+        200:
+          description: List of movies
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Movie'
+    post:
+      summary: Add a new movie
+      tags:
+        - Movies
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Movie'
+      responses:
+        201:
+          description: Movie created successfully
+        400:
+          description: Validation error
+
+  /api/movies/{id}:
+    get:
+      summary: Get a movie by ID
+      tags:
+        - Movies
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The ID of the movie
+      responses:
+        200:
+          description: Movie details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Movie'
+        404:
+          description: Movie not found
+    put:
+      summary: Update a movie
+      tags:
+        - Movies
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The ID of the movie
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Movie'
+      responses:
+        200:
+          description: Movie updated successfully
+        404:
+          description: Movie not found
+    delete:
+      summary: Delete a movie
+      tags:
+        - Movies
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The ID of the movie
+      responses:
+        204:
+          description: Movie deleted successfully
+        404:
+          description: Movie not found
+
+  /api/showtimes:
+    get:
+      summary: Retrieve all showtimes
+      tags:
+        - Showtimes
+      responses:
+        200:
+          description: List of showtimes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Showtime'
+    post:
+      summary: Add a new showtime
+      tags:
+        - Showtimes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Showtime'
+      responses:
+        201:
+          description: Showtime created successfully
+        400:
+          description: Validation error
+
+  /api/showtimes/{id}:
+    get:
+      summary: Get a showtime by ID
+      tags:
+        - Showtimes
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The ID of the showtime
+      responses:
+        200:
+          description: Showtime details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Showtime'
+        404:
+          description: Showtime not found
+    put:
+      summary: Update a showtime
+      tags:
+        - Showtimes
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The ID of the showtime
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Showtime'
+      responses:
+        200:
+          description: Showtime updated successfully
+        404:
+          description: Showtime not found
+    delete:
+      summary: Delete a showtime
+      tags:
+        - Showtimes
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The ID of the showtime
+      responses:
+        204:
+          description: Showtime deleted successfully
+        404:
+          description: Showtime not found
+
+  /api/user/register:
+    post:
+      summary: Register a new user
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegistration'
+      responses:
+        201:
+          description: User registered successfully
+        400:
+          description: Validation error
+
+  /api/user/login:
+    post:
+      summary: Authenticate a user
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLogin'
+      responses:
+        200:
+          description: Authentication successful
+        401:
+          description: Invalid credentials
+
+components:
+  schemas:
+    Movie:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        releaseDate:
+          type: string
+          format: date
+        genre:
+          type: string
+        director:
+          type: string
+        cast:
+          type: array
+          items:
+            type: string
+    Showtime:
+      type: object
+      properties:
+        movie:
+          type: string
+        theatre:
+          type: string
+        pricing:
+          type: number
+        language:
+          type: string
+        showDates:
+          type: array
+          items:
+            type: object
+            properties:
+              date:
+                type: string
+                format: date
+              times:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    startTime:
+                      type: string
+                    endTime:
+                      type: string
+    UserRegistration:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+    UserLogin:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
