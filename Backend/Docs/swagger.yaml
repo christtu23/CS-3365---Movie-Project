@@ -32,7 +32,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Movie'
+                  $ref: '#components/schemas/Movie'
     post:
       summary: Add a new movie
       tags:
@@ -42,7 +42,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Movie'
+              $ref: '#components/schemas/Movie'
       responses:
         201:
           description: Movie created successfully
@@ -67,7 +67,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Movie'
+                $ref: '#components/schemas/Movie'
         404:
           description: Movie not found
     put:
@@ -86,7 +86,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Movie'
+              $ref: '#components/schemas/Movie'
       responses:
         200:
           description: Movie updated successfully
@@ -122,7 +122,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Showtime'
+                  $ref: '#components/schemas/Showtime'
     post:
       summary: Create a new showtime
       tags:
@@ -132,7 +132,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Showtime'
+              $ref: '#components/schemas/Showtime'
       responses:
         201:
           description: Showtime created successfully
@@ -157,7 +157,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Showtime'
+                $ref: '#components/schemas/Showtime'
         404:
           description: Showtime not found
     put:
@@ -176,7 +176,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Showtime'
+              $ref: '#components/schemas/Showtime'
       responses:
         200:
           description: Showtime updated successfully
@@ -226,7 +226,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Showtime'
+                  $ref: '#components/schemas/Showtime'
         400:
           description: Invalid movie ID or other validation errors
         404:
@@ -280,7 +280,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Theatre'
+                  $ref: '#components/schemas/Theatre'
     post:
       summary: Create a new theatre
       tags:
@@ -290,7 +290,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Theatre'
+              $ref: '#components/schemas/Theatre'
       responses:
         201:
           description: Theatre created successfully
@@ -315,7 +315,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Theatre'
+                $ref: '#components/schemas/Theatre'
         404:
           description: Theatre not found
     put:
@@ -334,7 +334,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Theatre'
+              $ref: '#components/schemas/Theatre'
       responses:
         200:
           description: Theatre updated successfully
@@ -367,7 +367,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserRegistration'
+              $ref: '#components/schemas/RegisterRequest'
       responses:
         201:
           description: User registered successfully
@@ -384,7 +384,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserLogin'
+              $ref: '#components/schemas/LoginRequest'
       responses:
         200:
           description: Login successful
@@ -414,9 +414,237 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserProfile'
+              $ref: '#components/schemas/UpdateUserRequest'
       responses:
         200:
           description: Profile updated successfully
         401:
           description: Unauthorized
+
+components:
+  schemas:
+    Movie:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        releaseDate:
+          type: string
+          format: date
+        genre:
+          type: string
+        director:
+          type: string
+        cast:
+          type: array
+          items:
+            type: string
+
+    Showtime:
+      type: object
+      properties:
+        movie:
+          type: string
+          description: ID of the movie being shown
+        theatre:
+          type: string
+          description: ID of the theatre showing the movie
+        Pricing:
+          type: number
+          description: Pricing for the showtime
+        Language:
+          type: string
+          description: Language of the movie
+        showDates:
+          type: array
+          items:
+            type: object
+            properties:
+              date:
+                type: string
+                format: date
+              times:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    startTime:
+                      type: string
+                      description: Showtime start time in HH:mm format
+                    endTime:
+                      type: string
+                      description: Showtime end time in HH:mm format
+        seats:
+          type: array
+          items:
+            type: object
+            properties:
+              seatNumber:
+                type: string
+              isAvailable:
+                type: boolean
+              user:
+                type: string
+                description: ID of the user who booked the seat
+        status:
+          type: string
+          enum: ['Upcoming', 'Showing', 'Finished Airing', 'Cancelled']
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Theatre:
+      type: object
+      properties:
+        name:
+          type: string
+        location:
+          type: array
+          items:
+            type: string
+            enum: ['NorthOverton', 'WestLake', 'Downtown', 'SouthPark', 'EastSide']
+        contactInfo:
+          type: object
+          properties:
+            phone:
+              type: string
+            email:
+              type: string
+        hours:
+          type: array
+          items:
+            type: object
+            properties:
+              dayOfWeek:
+                type: string
+              openHours:
+                type: string
+                format: date-time
+              closeHours:
+                type: string
+                format: date-time
+        screens:
+          type: number
+
+    User:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        bookings:
+          type: array
+          items:
+            type: object
+            properties:
+              showtime:
+                type: string
+              seatNumber:
+                type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    LoginRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          description: The user's email address.
+        password:
+          type: string
+          description: The user's password.
+      required:
+        - email
+        - password
+
+    LoginResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          description: JWT token for the user to authenticate subsequent requests.
+
+    RegisterRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The user's full name.
+        email:
+          type: string
+          format: email
+          description: The user's email address.
+        password:
+          type: string
+          description: The user's password.
+        bookings:
+          type: array
+          items:
+            type: object
+            properties:
+              showtime:
+                type: string
+                description: The ID of the showtime the user has booked.
+              seatNumber:
+                type: string
+                description: The seat number for the booking.
+      required:
+        - name
+        - email
+        - password
+
+    RegisterResponse:
+      type: object
+      properties:
+        user:
+          type: object
+          properties:
+            name:
+              type: string
+            email:
+              type: string
+            bookings:
+              type: array
+              items:
+                type: object
+                properties:
+                  showtime:
+                    type: string
+                  seatNumber:
+                    type: string
+
+    UpdateUserRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The new name of the user.
+        email:
+          type: string
+          format: email
+          description: The new email of the user.
+        password:
+          type: string
+          description: The new password of the user.
+      required: []  # None are required here because the user can update one or more fields.
+
+    UpdateUserResponse:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string

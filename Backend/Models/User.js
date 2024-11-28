@@ -49,7 +49,7 @@ UserSchema.pre('save', async function(next)
 })
 
 //Compare Passwords
-UserSchema.methods.comparePasswords = async function (possiblePassword){
+UserSchema.methods.comparePassword = async function (possiblePassword){
     return bycrpt.compare(possiblePassword, this.password);
 }
 
