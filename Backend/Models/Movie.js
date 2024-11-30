@@ -12,6 +12,10 @@ const MovieSchema = new db.Schema({
     },
     releaseDate:{
         type:Date,
+        validate: {
+            validator: (v) => !isNaN(Date.parse(v)),
+            message: props => `${props.value} is not a valid date!`
+        },
     },
     genre:{
         type:String,

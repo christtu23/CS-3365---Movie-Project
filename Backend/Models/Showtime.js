@@ -81,4 +81,5 @@ ShowtimeSchema.pre('save',function(next){
     next();
 });
 
+ShowtimeSchema.index({movie:1, theatre:1, status:1})
 module.exports = db.model('Showtime',ShowtimeSchema)
