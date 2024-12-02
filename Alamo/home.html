@@ -1,0 +1,102 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Home | Ticket Master</title>
+		<link rel="stylesheet" href="assets/css/style.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css"/></noscript>
+	</head>
+	<body>
+		<!-- Header -->
+		<header class="movie-header">
+			<div class="header-inner">
+				<a href="home.html">
+					<img src="assets/css/images/logo.png" alt="Logo" style="filter: invert(1); max-width: 100px; height: auto;" />
+				</a>
+				<nav>
+					<a></a>
+					<ul class="nav-menu">
+						<li>
+							<a href="movies.html">Movies</a>
+							<ul class="dropdown grid-dropdown">
+								<li><a href="movies.html">Now Playing</a></li>
+								<li><a href="movies.html">Coming Soon</a></li>
+							</ul>
+						</li>
+						<li>
+							<a href="home.html">Location</a>
+							<ul class="dropdown grid-dropdown" id="location-dropdown">
+							</ul>
+						</li>
+						<li>
+							<a href="login.html">Account</a>
+						</li>
+						<li>
+							<a href="about.html">About</a>
+						</li>
+					</ul>
+				</nav>
+			</div>
+		</header>
+		<!-- Wrapper -->
+		<div id="wrapper">
+			<!-- Spacer -->
+			<div id="spacer">
+				test
+			</div>
+			<!-- News -->
+			<section id="intro" class="wrapper carousel">
+				<div class="inner">
+					<div class="carousel-slide active" style="background-image: url('assets/css/images/upcomingblockbusters.png');"></div>
+					<div class="carousel-slide" style="background-image: url('assets/css/images/saveseats.png');"></div>
+					<div class="carousel-slide" style="background-image: url('assets/css/images/rewardsprogram.png');"></div>
+					<div class="carousel-slide" style="background-image: url('assets/css/images/holidayspecials.png');"></div>
+					<div class="carousel-slide" style="background-image: url('assets/css/images/comingsoon.png');"></div>
+					<a class="prev" onclick="changeSlide(-1)">&#10094;</a>
+					<a class="next" onclick="changeSlide(1)">&#10095;</a>
+				</div>
+			</section>
+			<!-- Extras -->
+			<section id="extras" class="wrapper">
+				<!-- Rewards -->
+				<div class="extra-item" style="background-image: url('assets/css/images/popcorn.png');">
+					<div class="content">
+						<h2>Get Rewarded for Watching Movies!</h2>
+						<p>Get rewarded for watching movies with our rewards program. Watch movies at any supported theater and earn points for popcorn, drinks, and candies at your next visit. Earn enough points for free movies!</p>
+						<ul class="actions">
+							<li><a href="#" class="button">Join Rewards</a></li>
+						</ul>
+					</div>
+				</div>
+				<!-- Save Seats -->
+				<div class="extra-item" style="background-image: url('assets/css/images/seats.png');">
+					<div class="content">
+						<h2>Save Seats ahead of Time!</h2>
+						<p>Save seats ahead of time for cheap! See upcoming movies up to two weeks ahead and reserve seats for up to 10% cheaper; use that money instead for your popcorn!</p>
+						<ul class="actions">
+							<li><a href="#" class="button">View Upcoming</a></li>
+						</ul>
+					</div>
+				</div>
+			</section>
+			<!-- Movies -->
+			<section id="two" class="featured">
+				<div class="inner">
+					<h3>Featured Movies</h3>
+					<div id="movies" class="movies">
+					</div>
+				</div>
+			</section>
+		</div>
+		<!-- Footer -->
+		<footer id="footer" class="wrapper style1-alt">
+			<div class="inner">
+				<br>
+				Text
+			</div>
+		</footer>
+	</body>
+	<!-- scripts -->
+	<script src="assets/js/locations.js"></script>
+	<script src="assets/js/news.js"></script>
+	<script src="assets/js/movies.js"></script>
+</html>
