@@ -6,9 +6,6 @@
     <noscript><link rel="stylesheet" href="assets/css/noscript.css"/></noscript>
 </head>
 <body>
-    <!-- Ensure app.js is loaded -->
-    <script type="module" src="assets/js/app.js"></script>
-
     <header class="movie-header">
         <div class="header-inner">
             <a href="home.html">
@@ -35,7 +32,6 @@
         </section>
     </div>
 
-    <!-- Footer -->
     <footer id="footer" class="wrapper style1-alt">
         <div class="inner">
             <br>Text
@@ -43,9 +39,11 @@
     </footer>
 
     <script type="module">
+        import { getUserProfile, getBookingsForUser } from './api.js';
+
         async function fetchUserProfile() {
-            const profile = await getUserProfile();
-            document.getElementById('account-name').textContent = `Name: ${profile.name}`;
+            const userProfile = await getUserProfile();
+            document.getElementById('account-name').textContent = `Name: ${userProfile.name}`;
             const bookings = await getBookingsForUser();
             const historyContainer = document.getElementById('booking-history');
             historyContainer.innerHTML = '';
