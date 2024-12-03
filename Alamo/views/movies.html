@@ -1,0 +1,63 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Movies | Ticket Master</title>
+		<link rel="stylesheet" href="assets/css/style.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css"/></noscript>
+	</head>
+		<!-- Header -->
+		<header class="movie-header">
+		    <div class="header-inner">
+		    	<a href="home.html">
+		        	<img src="assets/css/images/logo.png" alt="Logo" style="filter: invert(1); max-width: 100px; height: auto;" />
+		    	</a>
+		        <nav>
+		        	<a></a>
+		            <ul class="nav-menu">
+		                <li>
+		                    <a href="movies.html">Location</a>
+		                    <ul class="dropdown grid-dropdown" id="location-dropdown">
+		                    </ul>
+		                </li>
+		                <li>
+		                    <a href="login.html">Account</a>
+		                </li>
+		                <li>
+		                    <a href="about.html">About</a>
+		                </li>
+		            </ul>
+		        </nav>
+		    </div>
+		</header>
+		<!-- Wrapper -->
+		<div id="wrapper">
+			<!-- Filter -->
+			<section id="filter-section" class="wrapper">
+			    <div class="inner filter-inner">
+			        <div class="filter-controls">
+			            <input type="text" id="movie-search" placeholder="Search for movies..." />
+			            <input type="date" id="date-filter" />
+			        </div>
+			    </div>
+			</section>
+			<!-- Movies -->
+			<section id="two" class="featured">
+			    <div class="inner">
+			    	<h3>Filter Movies by... </h3>
+			        <div id="movies" class="movies">
+			        </div>
+			    </div>
+			</section>
+		</div>
+		<!-- Footer -->
+		<footer id="footer" class="wrapper style1-alt">
+			<div class="inner">
+				<br>
+				Text
+			</div>
+		</footer>
+	</body>
+	<!-- scripts -->
+	<script src="assets/js/locations.js"></script>
+	<script type="module" src="/assets/js/api.js"></script>
+</html>
