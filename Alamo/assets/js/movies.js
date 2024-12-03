@@ -1,4 +1,4 @@
-import { getMovies } from "./api";
+import { getMovies } from "./api.js";
 
 // Movie data array
 // const movies = [
@@ -19,21 +19,28 @@ async function loadMovies() {
     const moviesContainer = document.getElementById('movies');
     try{
         const movies = await getMovies(); //-> Fetch movies from backend
-        movies.array.forEach(movie => {
+        console.log(movies)
+        console.log(movies.movies)
+        movies.movies.forEach((movie,index) => {
+            console.log(movie)
             const movieCard = document.createElement('div');
             movieCard.classList.add('movie')
-            movieElement.innerHTML = `
+            const movieImage = movie.image || "assets/css/images/homealone.jpeg"; // Placeholder image
+            const movieRating = movie.rating || "⭐⭐⭐⭐⭐"; // Default rating
+
+            movieCard.innerHTML = `
             <a href="movie.html?id=${movie._id}">
-                <img src="${movie.image}" alt="${movie.title}" />
+                <img src="${movieImage}" alt="${movie.title}" />
             </a>
             <h3>${movie.title}</h3>
-            <div class="rating">${movie.rating}</div>`;
-        moviesContainer.appendChild(movieElement);
+            <div class="rating">${movieRating}</div>`
+            ;
+            moviesContainer.appendChild(movieCard);
         });
     }catch(err)
     {
         console.log("[X][MBS-Front]: Failed to Fetch Movies")
-        console.log("[X][MBS-Front]: %s",err.messag)
+        console.log("[X][MBS-Front]: %s",err.message)
     }
     
 }

@@ -6,7 +6,7 @@
 
 
 /*----------------[UTILITY FUNCTIONS]----------------*/
-const apiUrl = "http://localhost:5000/";
+const apiUrl = "http://localhost:5000/api";
 
 async function handleResponse(response) {
     if (response.ok) {
