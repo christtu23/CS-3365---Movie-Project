@@ -113,4 +113,24 @@ const addBooking = async (req, res) => {
         res.status(500).json({ message: "Error adding booking", error: err.message });
     }
 };
-module.exports = {register, login, getProfile, updateProfile, addBooking}
+
+// Get bookings for a specific user
+const getBookingsForUser = async (req, res) => {
+    try {
+        const userId = req.user.id; // Assuming `req.user` is populated by middleware
+
+        const user = await User.findById(userId)
+            .populate('bookings.showtime', 'movie theatre showDates'); // Populate booking details
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Send only the bookings data
+        res.status(200).json({ bookings: user.bookings });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Error fetching bookings", error: err.message });
+    }
+};
+ module.exports = {register, login, getProfile, updateProfile, addBooking, getBookingsForUser}

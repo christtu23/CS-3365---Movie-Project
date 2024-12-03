@@ -9,9 +9,12 @@ router.post('/register', userController.register);
 router.post('/login', userController.login);
 //Returns Profile (Requires Authenticaiton Token)
 router.get('/profile', authMiddleware, userController.getProfile);
+//Returns all the users bookings (Requires Authenticaiton Token)
+router.get('/bookings', authMiddleware, userController.getBookingsForUser);
 //Updates Profile (Requires Authenticaiton Token)
 router.put('/profile', authMiddleware, userController.updateProfile);
 //Book A Seat (Requires Authenticaiton Token)
 router.post('/book', authMiddleware, userController.addBooking);
+
 
 module.exports = router;

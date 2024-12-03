@@ -58,6 +58,10 @@ async function bookMovieTicket(bookingDetails, token) {
     return await makeRequest("/showtimes/book", "POST", bookingDetails, token);
 }
 
+export const getBookingsForUser = async (token) => {
+    return await makeRequest("/user/bookings", "GET", null, token);
+};
+
 /*----------------[SHOWTIMES]----------------*/
 async function getShowtimesByMovieAndDate(movieId, date) {
     return await makeRequest(`/showtimes/movie/${movieId}/date/${date}`, "GET");

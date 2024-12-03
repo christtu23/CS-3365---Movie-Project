@@ -39,19 +39,48 @@
     </footer>
 
     <script type="module">
-        import { getUserProfile, getBookingsForUser } from './api.js';
+        import { getUserProfile, getBookingsForUser } from './assets/js/api.js';
 
         async function fetchUserProfile() {
-            const userProfile = await getUserProfile();
-            document.getElementById('account-name').textContent = `Name: ${userProfile.name}`;
-            const bookings = await getBookingsForUser();
-            const historyContainer = document.getElementById('booking-history');
-            historyContainer.innerHTML = '';
-            bookings.forEach(booking => {
-                const listItem = document.createElement('li');
-                listItem.textContent = `Movie: ${booking.movie} | Showtime: ${booking.showtime}`;
-                historyContainer.appendChild(listItem);
-            });
+            const token = localStorage.getItem('authToken');
+			console.log("Token: ",token)
+            if (!token) {
+                alert('Please log in first!');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            try {
+                // Fetch the user's profile
+                const userProfile = await getUserProfile(token);
+                document.getElementById('account-name').textContent = `Name: ${userProfile.name}`;
+
+                // Fetch the user's booking history
+                const response = await getBookingsForUser(token);
+				const bookings = response.bookings || [];
+                const historyContainer = document.getElementById('booking-history');
+                historyContainer.innerHTML = ''; // Clear any existing content
+
+                if (bookings.length === 0) {
+                    historyContainer.innerHTML = '<li>No bookings found.</li>';
+                } else {
+					console.log(bookings)
+                    bookings.forEach(booking => {
+                        const listItem = document.createElement('li');
+                        listItem.innerHTML = `
+                            <strong>Movie:</strong> ${booking.showtime.movie.title} 
+                            <br><strong>Theatre:</strong> ${booking.showtime.theatre.name} 
+                            <br><strong>Showtime:</strong> ${new Date(booking.showtime.showDates[0].date).toLocaleString()} 
+                            <br><strong>Seat:</strong> ${booking.seatNumber}
+                            <br><br>
+                        `;
+                        historyContainer.appendChild(listItem);
+                    });
+                }
+            } catch (err) {
+                console.error('Error fetching user profile or bookings:', err);
+                alert('Error loading user data.');
+            }
         }
 
         fetchUserProfile();
