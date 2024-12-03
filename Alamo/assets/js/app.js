@@ -2,15 +2,23 @@
 This is our central point of communication for our app, it houses everything
 logic wise, such as session handling
 */
-import { CONFIG } from "./config"
-
+import { CONFIG } from "./config.js"
+import {
+    registerUser as apiRegisterUser,
+    loginUser as apiLoginUser,
+    getUserProfile,
+    updateUserProfile,
+    getMovies,
+    bookMovieTicket
+} from "./api.js";
 
 
 /*----------------[APP]----------------*/
 function initApp() {
     loadSessionToken();
     if (Session_Info.token) {
-      console.log("[X][MBS-Front]: User session active. Token loaded.");
+      console.log("[X][MBS-Front]: User session active. Token loaded.",Session_Info.token);
+      fetchUserProfile();
     }else{
         console.log("[X][MBS-Front]: No Session token found, login required for advance access");
     }
@@ -38,78 +46,70 @@ function loadSessionToken(){ //-> Loads current auth token from localstorage
     return null
 }
 
-/*----------------[AUTHENTICATION FUNCTIONS]----------------*/
-async function loginUser(email, password) { //-> User Login
-    try {
-        const response = await fetch(`${CONFIG.BACKEND_URL}/auth/login`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, password }),
-        });
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || "Login failed");
-        }
-        //Login Succesfull, Save Session Token
-        const data = await response.json();
-        saveSessionToken(data.token);
-        AppState.user = data.user;
-        console.log("[X][MBS-Front]: User logged in successfully:", AppState.user);
-
-        //Token Saved | User Logged In | Now Redirect
-        const redirectPath = localStorage.getItem("redirectPath") || "/home.html";
-        localStorage.removeItem("redirectPath"); // Clear stored path
-        window.location.href = redirectPath;
-    } catch (err) {
-        console.error("[X][MBS-Front]: Error logging in:", err.message);
-    }
-}
-async function registerUser(userDetails) { //-> User Register
-try {
-    const response = await fetch(`${CONFIG.BACKEND_URL}/auth/register`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(userDetails),
-    });
-    //Registration Failed Check
-    if (!response.ok) throw new Error("[X][MBS-Front]: Registration failed");
-
-    //Registration Successfull Succesfull | Redirect to login
-    const data = await response.json();
-    console.log("[X][MBS-Front]: User registered successfully:", data);
-    window.location.href = "/login.html";
-} catch (err) {
-    console.error("[X][MBS-Front]: Error registering user:", err.message);
-}
-}
-function logoutUser() {//-> User Logout | Nothing fancy needs to be done here without the correct token, they can't manipulate user data
+function clearSession() { //-> Clears the session
     Session_Info.user = null;
     Session_Info.token = null;
     localStorage.removeItem("authToken");
-    console.log("[X][MBS-Front]: User logged out successfully.");
-    redirectIfNotAuthenticated(); // Redirect to login page
 }
 
-/*----------------[AUTHENTICATION LISTENERS]----------------*/
+/*----------------[AUTHENTICATION FUNCTIONS]----------------*/
+async function loginUser(email, password) {
+    try {
+        const data = await apiLoginUser({ email, password });
+        saveSessionToken(data.token);
+        Session_Info.user = data.user;
+        console.log("[X][MBS-Front]: User logged in successfully:", Session_Info.user);
 
-document.addEventListener("DOMContentLoaded", () => { //-> Authentication Form Listeners
-    //Login Form
+        const redirectPath = localStorage.getItem("redirectPath") || "/home.html";
+        localStorage.removeItem("redirectPath");
+        window.location.href = redirectPath;
+    } catch (err) {
+        console.error("[X][MBS-Front]: Login failed:", err.message);
+    }
+}
+
+async function registerUser(userDetails) {
+    try {
+        await apiRegisterUser(userDetails);
+        console.log("[X][MBS-Front]: User registered successfully.");
+        window.location.href = "/login.html";
+    } catch (err) {
+        console.error("[X][MBS-Front]: Registration failed:", err.message);
+    }
+}
+
+async function fetchUserProfile() {
+    try {
+        const userProfile = await getUserProfile(Session_Info.token);
+        Session_Info.user = userProfile;
+        console.log("[X][MBS-Front]: User profile fetched:", userProfile);
+    } catch (err) {
+        console.error("[X][MBS-Front]: Failed to fetch user profile:", err.message);
+    }
+}
+
+function logoutUser() {
+    clearSession();
+    redirectIfNotAuthenticated();
+}
+
+/*----------------[EVENT LISTENERS]----------------*/
+document.addEventListener("DOMContentLoaded", () => {
     const loginForm = document.getElementById("login-form");
     if (loginForm) {
-      loginForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const email = e.target.email.value;
-        const password = e.target.password.value;
-        await loginUser(email, password);
-      });
+        loginForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const email = e.target.email.value;
+            const password = e.target.password.value;
+            await loginUser(email, password);
+        });
     }
 
-    //Registration Form
     const registerForm = document.getElementById("register-form");
     if (registerForm) {
         registerForm.addEventListener("submit", async (e) => {
             e.preventDefault();
-            const username = e.target.username.value;
+            const name = e.target.username.value;
             const email = e.target.email.value;
             const password = e.target.password.value;
             const confirmPassword = e.target.confirm_password.value;
@@ -119,24 +119,21 @@ document.addEventListener("DOMContentLoaded", () => { //-> Authentication Form L
                 return;
             }
 
-            const userDetails = { username, email, password };
+            const userDetails = { name, email, password };
             await registerUser(userDetails);
         });
     }
-  
-    // Call app initialization
+
     initApp();
 });
 
-function redirectIfNotAuthenticated() { //-> Authentication Redirect (if not logged in)
-    if (!AppState.token) {
+function redirectIfNotAuthenticated() {
+    if (!Session_Info.token) {
         console.log("[X][MBS-Front]: Redirecting to login page.");
-        localStorage.setItem("redirectPath", currentPath); // Store the current page
-        console.log("[X][MBS-Front]: Redirecting to login page.");
+        const currentPath = window.location.pathname;
+        localStorage.setItem("redirectPath", currentPath);
         window.location.href = "/login.html";
     }
 }
-
-
 
 

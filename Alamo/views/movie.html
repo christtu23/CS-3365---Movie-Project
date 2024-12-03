@@ -1,57 +1,80 @@
 <!DOCTYPE HTML>
 <html>
-	<head>
-		<title>Login | Ticket Master</title>
-		<link rel="stylesheet" href="assets/css/style.css" />
-		<noscript><link rel="stylesheet" href="assets/css/noscript.css"/></noscript>
-	</head>
-	<body>
-		<!-- Header -->
-		<header class="movie-header">
-		    <div class="header-inner">
-		    	<a href="home.html">
-		        	<img src="assets/css/images/logo.png" alt="Logo" style="filter: invert(1); max-width: 100px; height: auto;" />
-		    	</a>
-		        <nav>
-		        	<a></a>
-		            <ul class="nav-menu">
-		                <li>
-		                    <a href="movies.html">Movies</a>
-		                    <ul class="dropdown grid-dropdown">
-		                        <li><a href="movies.html">Now Playing</a></li>
-		                        <li><a href="movies.html">Coming Soon</a></li>
-		                    </ul>
-		                </li>
-		                <li>
-		                    <a href="home.html">Location</a>
-		                    <ul class="dropdown grid-dropdown" id="location-dropdown">
-		                    </ul>
-		                </li>
-		                <li>
-		                    <a href="login.html">Account</a>
-		                </li>
-		            </ul>
-		        </nav>
-		    </div>
-		</header>
-		<!-- Wrapper -->
-		<div id="wrapper">
-		    <!-- Login -->
-		    <section class="movie-section">
-		        <div class="movie-container">
-		            <h2>Movie</h2>
-		            	Text
-		        </div>
-		    </section>
-		</div>
-		<!-- Footer -->
-		<footer id="footer" class="wrapper style1-alt">
-			<div class="inner">
-				<br>
-				Text
-			</div>
-		</footer>
-	</body>
-	<!-- scripts -->
-	<script src="assets/js/locations.js"></script>
+<head>
+    <title>Movies | Ticket Master</title>
+    <link rel="stylesheet" href="assets/css/style.css" />
+    <noscript><link rel="stylesheet" href="assets/css/noscript.css"/></noscript>
+</head>
+<body>
+    <!-- Header -->
+    <header class="movie-header">
+        <div class="header-inner">
+            <a href="home.html">
+                <img src="assets/css/images/logo.png" alt="Logo" style="filter: invert(1); max-width: 100px; height: auto;" />
+            </a>
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="movies.html">Location</a></li>
+                    <li><a href="login.html">Account</a></li>
+                    <li><a href="about.html">About</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Wrapper -->
+    <div id="wrapper">
+        <!-- Filter Section -->
+        <section id="filter-section" class="wrapper">
+            <div class="inner filter-inner">
+                <div class="filter-controls">
+                    <input type="text" id="movie-search" placeholder="Search for movies..." />
+                    <input type="date" id="date-filter" />
+                </div>
+            </div>
+        </section>
+
+        <!-- Movies Section -->
+        <section id="movies-section" class="featured">
+            <div class="inner">
+                <h3>Movies Now Playing</h3>
+                <div id="movies" class="movies"></div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer id="footer" class="wrapper style1-alt">
+        <div class="inner">
+            <br>Text
+        </div>
+    </footer>
+
+    <script type="module" src="assets/js/app.js"></script>
+    <script type="module">
+        // Fetch movies and display them
+        async function fetchMovies() {
+            const movies = await getMovies();
+            const moviesContainer = document.getElementById('movies');
+            moviesContainer.innerHTML = '';
+            movies.forEach(movie => {
+                const movieElement = document.createElement('div');
+                movieElement.classList.add('movie-card');
+                movieElement.innerHTML = `
+                    <h4>${movie.title}</h4>
+                    <button onclick="viewShowtimes(${movie.id})">View Showtimes</button>
+                `;
+                moviesContainer.appendChild(movieElement);
+            });
+        }
+
+        async function viewShowtimes(movieId) {
+            const date = document.getElementById('date-filter').value;
+            const showtimes = await getShowtimesByMovieAndDate(movieId, date);
+            alert(`Showtimes for movie: ${showtimes.map(s => s.time).join(', ')}`);
+        }
+
+        fetchMovies();
+    </script>
+</body>
 </html>

@@ -6,7 +6,7 @@
 
 
 /*----------------[UTILITY FUNCTIONS]----------------*/
-const apiUrl = "http://localhost:5000/api";
+import { CONFIG } from "./config.js"
 
 async function handleResponse(response) {
     if (response.ok) {
@@ -17,77 +17,59 @@ async function handleResponse(response) {
     }
 }
 
+//We make all requests from here as a easy way to consolidate logic, like passing the auth token
+async function makeRequest(endpoint, method = "GET", data = null, token = null) {
+    const headers = {
+        "Content-Type": "application/json",
+    };
+
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+
+    const options = { method, headers };
+    if (data) options.body = JSON.stringify(data);
+
+    const response = await fetch(`${CONFIG.BACKEND_URL}${endpoint}`, options);
+    return handleResponse(response);
+}
+
 /*----------------[USER AUTHENTICATION]----------------*/
 async function registerUser(userInfo) {
-    const response = await fetch(`${apiUrl}/user/register`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(userInfo),
-    });
-
-    return handleResponse(response);
+    return await makeRequest("/user/register", "POST", userInfo);
 }
 
 async function loginUser(credentials) {
-    const response = await fetch(`${apiUrl}/user/login`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(credentials),
-    });
-
-    return handleResponse(response);
+    return await makeRequest("/user/login", "POST", credentials);
 }
 
-async function getUserProfile(userId) {
-    const response = await fetch(`${apiUrl}/user/${userId}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-    });
-
-    return handleResponse(response);
+async function getUserProfile(token) {
+    return await makeRequest("/user/profile", "GET", null, token);
 }
 
-async function updateUserProfile(userId, userData) {
-    const response = await fetch(`${apiUrl}/user/${userId}`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(userData),
-    });
-
-    return handleResponse(response);
+async function updateUserProfile(userData, token) {
+    return await makeRequest("/user/profile", "PUT", userData, token);
 }
 
 /*----------------[MOVIE BOOKINGS]----------------*/
 async function getMovies() {
-    const response = await fetch(`${apiUrl}/movies`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-    });
-
-    return handleResponse(response);
+    return await makeRequest("/movies", "GET");
 }
 
-async function bookMovieTicket(userId, movieId, ticketData) {
-    const response = await fetch(`${apiUrl}/booking/${userId}/${movieId}`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(ticketData),
-    });
-
-    return handleResponse(response);
+async function bookMovieTicket(bookingDetails, token) {
+    return await makeRequest("/showtimes/book", "POST", bookingDetails, token);
 }
 
-/* Export: */
-export { registerUser, loginUser, getUserProfile, updateUserProfile, getMovies, bookMovieTicket };
+/*----------------[SHOWTIMES]----------------*/
+async function getShowtimesByMovieAndDate(movieId, date) {
+    return await makeRequest(`/showtimes/movie/${movieId}/date/${date}`, "GET");
+}
+
+/* Export API Methods */
+export { 
+    registerUser, 
+    loginUser, 
+    getUserProfile, 
+    updateUserProfile, 
+    getMovies, 
+    bookMovieTicket, 
+    getShowtimesByMovieAndDate 
+};

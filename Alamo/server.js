@@ -8,7 +8,9 @@ const port = 4000;
 app.set('views', path.join(__dirname, 'views'));
 
 // Serve static files from the "assets" folder
-app.use('/assets',express.static(path.join(__dirname, 'assets')));
+app.use('/assets', (req, res, next) => {
+    next();
+}, express.static(path.join(__dirname, 'assets'),{ extensions: ['js'] }));
 
 // Dynamically serve HTML files from the 'views' directory
 app.get('*', (req, res) => {
