@@ -6,6 +6,11 @@
 		<noscript><link rel="stylesheet" href="assets/css/noscript.css"/></noscript>
 	</head>
 	<body>
+		<!-- Ensure app.js is loaded -->
+		<script type="module" src="assets/js/app.js"></script>
+		<script>
+			redirectIfNotAuthenticated();
+		</script>
 		<!-- Header -->
 		<header class="movie-header">
 		    <div class="header-inner">

@@ -19,6 +19,7 @@ async function loadMovies() {
     const moviesContainer = document.getElementById('movies');
     try{
         const movies = await getMovies(); //-> Fetch movies from backend
+        console.log("[O][MBS-Front]: Fetching movies from API...")
         console.log(movies)
         console.log(movies.movies)
         movies.movies.forEach((movie,index) => {
@@ -36,6 +37,7 @@ async function loadMovies() {
             <div class="rating">${movieRating}</div>`
             ;
             moviesContainer.appendChild(movieCard);
+            console.log("[+][MBS-Front]: Movie Fetched: : ",movie.title)
         });
     }catch(err)
     {
