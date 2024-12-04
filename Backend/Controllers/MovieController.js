@@ -85,10 +85,10 @@ const updateMovie = async (req, res) => {
 
 //--> Add New Movie
 const addMovie = async (req, res) => {
-    const { title, description, releaseDate, genre, ticketprice} = req.body;
+    const { title, description, releaseDate, genre, director, cast} = req.body;
     console.log(req.body)
     try{
-        const newMovie = new Movie({title, description, releaseDate, genre, ticketprice});
+        const newMovie = new Movie({title, description, releaseDate, genre, director, cast});
         await newMovie.save();
         res.status(201).json(newMovie);
     }catch(error){

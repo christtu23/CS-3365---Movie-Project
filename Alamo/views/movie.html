@@ -1,0 +1,72 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Movie Details | Ticket Master</title>
+    <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+    <header class="movie-header">
+        <div class="header-inner">
+            <a href="home.html">
+                <img src="assets/css/images/logo.png" alt="Logo" style="filter: invert(1); max-width: 100px; height: auto;" />
+            </a>
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="movies.html">Movies</a></li>
+                    <li><a href="login.html">Account</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div id="wrapper">
+        <!-- Movie Details Section -->
+        <section class="movie-section">
+            <div class="movie-container">
+                <h2 id="movie-title">Movie Title</h2>
+                <p id="movie-description">Movie description goes here.</p>
+                <h3>Showtimes</h3>
+                <div id="showtimes"></div>
+                <button id="book-button" onclick="bookTicket()">Book Ticket</button>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer id="footer" class="wrapper style1-alt">
+        <div class="inner">
+            <br>Text
+        </div>
+    </footer>
+
+    <script type="module">
+        import { getMovieDetails, bookMovieTicket } from './api.js';
+
+        async function fetchMovieDetails(movieId) {
+            const movie = await getMovieDetails(movieId);
+            document.getElementById('movie-title').textContent = movie.title;
+            document.getElementById('movie-description').textContent = movie.description;
+            const showtimesContainer = document.getElementById('showtimes');
+            showtimesContainer.innerHTML = '';
+            movie.showtimes.forEach(showtime => {
+                const showtimeElement = document.createElement('button');
+                showtimeElement.textContent = showtime;
+                showtimesContainer.appendChild(showtimeElement);
+            });
+        }
+
+        function bookTicket() {
+            const selectedShowtime = document.querySelector('#showtimes button.selected');
+            if (!selectedShowtime) {
+                alert('Please select a showtime.');
+                return;
+            }
+            const movieId = 1; // Replace with dynamic movie ID
+            const showtime = selectedShowtime.textContent;
+            bookMovieTicket({ movieId, showtime });
+        }
+
+        fetchMovieDetails(1); // Replace with dynamic movie ID
+    </script>
+</body>
+</html>
