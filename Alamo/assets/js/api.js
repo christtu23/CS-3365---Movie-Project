@@ -69,6 +69,7 @@ async function getShowtimesByMovieAndDate(movieId, date) {
 
 /* Export API Methods */
 export { 
+    makeRequest,
     registerUser, 
     loginUser, 
     getUserProfile, 

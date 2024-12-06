@@ -64,22 +64,35 @@
                     historyContainer.innerHTML = '<li>No bookings found.</li>';
                 } else {
 					console.log(bookings)
-                    bookings.forEach(booking => {
+                    for (let booking of bookings) {
+                        const moviePromise = getMovieById(booking.showtime.movie);  
+                        // Wait for both movie 
+                        const [movie] = await Promise.all([moviePromise]);
+                        console.log(booking)
                         const listItem = document.createElement('li');
                         listItem.innerHTML = `
-                            <strong>Movie:</strong> ${booking.showtime.movie.title} 
-                            <br><strong>Theatre:</strong> ${booking.showtime.theatre.name} 
+                            <strong>Movie:</strong> ${movie.title} 
+                            <br><strong>Theatre:</strong> ${booking.showtime.theatre} 
                             <br><strong>Showtime:</strong> ${new Date(booking.showtime.showDates[0].date).toLocaleString()} 
                             <br><strong>Seat:</strong> ${booking.seatNumber}
                             <br><br>
                         `;
                         historyContainer.appendChild(listItem);
-                    });
+                    };
                 }
             } catch (err) {
                 console.error('Error fetching user profile or bookings:', err);
                 alert('Error loading user data.');
             }
+        }
+
+        //Util functions, its better practice is store these in our api.js but we'll keep this here for testing
+        async function getMovieById(movieId) {
+            const response = await fetch(`http://localhost:5000/api/movies/${movieId}`);
+            if (!response.ok) {
+                throw new Error('Error fetching movie');
+            }
+            return response.json(); // Assuming the movie data is returned as a JSON object
         }
 
         fetchUserProfile();

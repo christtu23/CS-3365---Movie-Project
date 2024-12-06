@@ -17,7 +17,6 @@ import {
 function initApp() {
     loadSessionToken();
     if (Session_Info.token) {
-      console.log("[X][MBS-Front]: User session active. Token loaded.",Session_Info.token);
       fetchUserProfile();
     }else{
         console.log("[X][MBS-Front]: No Session token found, login required for advance access");
@@ -50,16 +49,18 @@ function clearSession() { //-> Clears the session
     Session_Info.user = null;
     Session_Info.token = null;
     localStorage.removeItem("authToken");
+    localStorage.removeItem("user");
 }
 
 /*----------------[AUTHENTICATION FUNCTIONS]----------------*/
 async function loginUser(email, password) {
     try {
         const data = await apiLoginUser({ email, password });
+        console.log(data)
         saveSessionToken(data.token);
-        Session_Info.user = data.user;
-        console.log("[X][MBS-Front]: User logged in successfully:", Session_Info.user);
 
+        fetchUserProfile();
+        
         const redirectPath = localStorage.getItem("redirectPath") || "/home.html";
         localStorage.removeItem("redirectPath");
         window.location.href = redirectPath;
@@ -82,7 +83,13 @@ async function fetchUserProfile() {
     try {
         const userProfile = await getUserProfile(Session_Info.token);
         Session_Info.user = userProfile;
-        console.log("[X][MBS-Front]: User profile fetched:", userProfile);
+        console.log(userProfile, userProfile._id)
+        localStorage.setItem('userId',userProfile._id)
+        console.log("[X][MBS-Front]: User Session Loaded");
+        console.log("[X][MBS-ADMIN-DEBUG:]: =================[Session Info]=================")
+        console.log("[X][MBS-ADMIN-DEBUG:]: Session Token: ",Session_Info.token)
+        console.log("[X][MBS-ADMIN-DEBUG:]: Session User: ",Session_Info.user)
+        console.log("[X][MBS-ADMIN-DEBUG:]: ================================================")
     } catch (err) {
         console.error("[X][MBS-Front]: Failed to fetch user profile:", err.message);
     }

@@ -84,30 +84,59 @@ const updateProfile = async (req, res) => {
 // Add a booking to user
 const addBooking = async (req, res) => {
     try {
-        const { showtimeId, seatNumber } = req.body;
-        const userId = req.user.id; // Assuming `req.user` is populated by middleware
+        const { movieId, showtimeDate, startTime, seats, userId } = req.body;
 
-        const showtime = await Showtime.findById(showtimeId);
+        // Validate if all required data is present
+        if (!movieId || !showtimeDate || !startTime || !seats || !userId) {
+            return res.status(400).json({ message: 'All fields are required' });
+        }
+
+        // Ensure that the user exists
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Find the showtime matching the movie, date, and time
+        const showtime = await Showtime.findOne({
+            "movie": movieId,
+            "showDates.date": new Date(showtimeDate),
+            "showDates.times.startTime": startTime,
+        });
+
         if (!showtime) {
             return res.status(404).json({ message: "Showtime not found" });
         }
 
-        const seat = showtime.seats.find(seat => seat.seatNumber === seatNumber);
-        if (!seat || !seat.isAvailable) {
-            return res.status(400).json({ message: "Seat is not available" });
+        // Iterate through the seats array and check availability
+        console.log(showtime)
+        for (let seatNumber of seats) {
+            const seat = showtime.seats.find(seat => seat.seatNumber === seatNumber);
+
+            // Check if the seat exists and is available
+            if (!seat) {
+                bookedSeats.push({ seatNumber, message: "Seat not found" });
+                continue;
+            }
+
+            if (!seat.isAvailable) {
+                bookedSeats.push({ seatNumber, message: "Seat is already booked" });
+                continue;
+            }
+
+            // Mark seat as booked
+            seat.isAvailable = false;
+            seat.user = userId;
+
+            // Add the seat to the user's bookings
+            user.bookings.push({ showtime: showtime._id, seatNumber });
+
+            await showtime.save();
         }
 
-        // Mark the seat as booked and assign user
-        seat.isAvailable = false;
-        seat.user = userId;
-        await showtime.save();
-
-        // Add booking to user
-        const user = await User.findById(userId);
-        user.bookings.push({ showtime: showtimeId, seatNumber });
         await user.save();
 
-        res.status(200).json({ message: "Booking successful", booking: { showtime, seatNumber } });
+        res.status(200).json({ message: "Booking successful", booking: { showtime, seats } });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Error adding booking", error: err.message });

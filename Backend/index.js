@@ -17,6 +17,7 @@ const movieRoutes = require('./Routes/Movies'); // Import movie routes
 const showtimeRoutes = require('./Routes/Showtime')
 const theatreRoutes = require('./Routes/Theatre'); // Import movie routes
 const UserRoutes = require('./Routes/User')
+const SeatsRoutes = require('./Routes/Seats')
 
 /*===================================API MOUNTS================================*/
 app.use(express.json()); //This will automatically parse incoming request as JSON'S
@@ -30,6 +31,7 @@ app.use("/api/movies",movieRoutes)
 app.use("/api/showtimes",showtimeRoutes)
 app.use("/api/theatre",theatreRoutes)
 app.use("/api/user",UserRoutes)
+app.use("/api/seats",SeatsRoutes)
 
 /* Swagger Documentation */
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc));
