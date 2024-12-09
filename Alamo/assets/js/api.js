@@ -67,6 +67,15 @@ async function getShowtimesByMovieAndDate(movieId, date) {
     return await makeRequest(`/showtimes/movie/${movieId}/date/${date}`, "GET");
 }
 
+/*----------------[REVIEWS]----------------*/
+async function getReviews(movieId){
+    return await makeRequest(`/reviews/${movieId}`,"GET")
+}
+async function postReview(review){
+    return await makeRequest(`/reviews`,"POST",review);
+}
+
+
 /* Export API Methods */
 export { 
     makeRequest,
@@ -76,5 +85,7 @@ export {
     updateUserProfile, 
     getMovies, 
     bookMovieTicket, 
-    getShowtimesByMovieAndDate 
+    getShowtimesByMovieAndDate,
+    getReviews, 
+    postReview
 };

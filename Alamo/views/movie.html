@@ -51,12 +51,14 @@
 
     <script type="module" src="assets/js/app.js"></script>
     <script type="module">
+        import { getMovies, getShowtimesByMovieAndDate, makeRequest } from './assets/js/api.js';
+
         // Fetch movies and display them
         async function fetchMovies() {
             const movies = await getMovies();
             const moviesContainer = document.getElementById('movies');
             moviesContainer.innerHTML = '';
-            movies.forEach(movie => {
+            movies.movies.forEach(movie => {
                 const movieElement = document.createElement('div');
                 movieElement.classList.add('movie-card');
                 movieElement.innerHTML = `

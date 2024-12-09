@@ -85,6 +85,22 @@
 					</div>
 				</div>
 			</section>
+			<!-- Review Section -->
+			<section id="review-section" style="display:none;">
+				<h2>Reviews</h2>
+				<ul id="reviews-list"></ul>
+				<form id="review-form">
+					<textarea id="review-content" placeholder="Write your review..." required></textarea>
+					<select id="review-rating">
+						<option value="5">⭐⭐⭐⭐⭐</option>
+						<option value="4">⭐⭐⭐⭐</option>
+						<option value="3">⭐⭐⭐</option>
+						<option value="2">⭐⭐</option>
+						<option value="1">⭐</option>
+					</select>
+					<button type="submit">Submit Review</button>
+				</form>
+			</section>
 		</div>
 		<!-- Footer -->
 		<footer id="footer">
@@ -93,10 +109,10 @@
 				Text
 			</div>
 		</footer>
-	</body>
-	<!-- scripts -->
+			<!-- scripts -->
 	<script type="module" src="/assets/js/api.js"></script>
 	<script src="/assets/js/locations.js"></script>
 	<script src="/assets/js/news.js"></script>
 	<script type="module" src="/assets/js/movies.js"></script>
+	</body>
 </html>

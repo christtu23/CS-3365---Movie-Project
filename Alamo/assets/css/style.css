@@ -640,3 +640,77 @@ button:hover {
     background-color: #ddd;  /* Grey for disabled */
     cursor: not-allowed;
 }
+
+/*Review Section*/
+#review-section {
+    background-color: #2c2c2c; /* Dark gray background for better contrast */
+    color: #ffffff; /* White text for visibility */
+    padding: 20px; /* Add some padding for spacing */
+    border-radius: 8px; /* Rounded corners for a modern look */
+    margin-top: 20px; /* Add some space above the section */
+}
+
+#review-section h2 {
+    color: #ffcc00; /* Highlighted header color */
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+#reviews-list {
+    list-style-type: none; /* Remove bullet points */
+    padding: 0;
+    margin: 0 0 20px 0; /* Add margin below the list */
+}
+
+#reviews-list li {
+    background: #3a3a3a; /* Slightly lighter gray for each review */
+    margin-bottom: 10px; /* Space between reviews */
+    padding: 10px;
+    border-radius: 5px;
+}
+
+#reviews-list li strong {
+    color: #ffcc00; /* Highlight usernames */
+}
+
+#reviews-list li span {
+    color: #ffd700; /* Gold color for stars */
+}
+
+#review-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Spacing between form elements */
+}
+
+#review-form textarea {
+    background: #3a3a3a; /* Match the background with reviews */
+    color: #ffffff; /* White text */
+    border: 1px solid #555555; /* Subtle border */
+    border-radius: 5px;
+    padding: 10px;
+    resize: none; /* Disable resizing */
+    height: 100px; /* Fixed height */
+}
+
+#review-form select {
+    background: #3a3a3a; /* Match the theme */
+    color: #ffffff;
+    border: 1px solid #555555;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+#review-form button {
+    background: #ffcc00; /* Button color */
+    color: #000000; /* Text color for contrast */
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+#review-form button:hover {
+    background: #e6b800; /* Slightly darker yellow on hover */
+}
