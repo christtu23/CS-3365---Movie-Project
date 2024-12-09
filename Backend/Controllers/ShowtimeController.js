@@ -33,19 +33,24 @@ const CreateShowtime = async (req, res) => {
     }
 };
 
-// Get all showtimes
-const GetAllShowtimes = async (req, res) => {
-    try {
-        const showtimes = await Showtime.find()
-            .populate('movie', 'title') // Populate movie with its title
-            .populate('theatre', 'name'); // Populate theatre with its name
+// Get all showtimes with optional date range filtering
+async function GetAllShowtimes(req, res) {
+    const { startDate, endDate } = req.query;
 
-        res.status(200).json(showtimes);
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: "Error fetching showtimes", error: err.message });
+    let filter = {};
+    if (startDate || endDate) {
+        filter.date = {};
+        if (startDate) filter.date.$gte = new Date(startDate);
+        if (endDate) filter.date.$lte = new Date(endDate);
     }
-};
+
+    try {
+        const showtimes = await Showtime.find(filter).populate('movie'); // Ensure 'movie' field is populated
+        res.json(showtimes);
+    } catch (err) {
+        res.status(500).json({ message: '[X][MBS]: Failed to fetch showtimes', error: err.message });
+    }
+}
 
 // Get a single showtime by ID
 const GetShowtimeById = async (req, res) => {
@@ -53,7 +58,8 @@ const GetShowtimeById = async (req, res) => {
         const showtimeId = req.params.id;
         const showtime = await Showtime.findById(showtimeId)
             .populate('movie', 'title')
-            .populate('theatre', 'name');
+            .populate('theatre', 'name')
+            .populate('seats');
 
         if (!showtime) {
             return res.status(404).json({ message: "Showtime not found" });
@@ -134,7 +140,12 @@ const BookSeat = async (req, res) => {
         const { showtimeId, seatNumber } = req.body;
         const userId = req.user._id; // Assuming authenticated user ID is in req.user
 
-        const showtime = await Showtime.findById(showtimeId);
+        // Find the showtime matching the movie, date, and time
+        const showtime = await Showtime.findOne({
+            "movie": movieId,
+            "showDates.date": new Date(showtimeDate),
+            "showDates.times.startTime": startTime,
+        });
 
         if (!showtime) {
             return res.status(404).json({ message: "Showtime not found" });

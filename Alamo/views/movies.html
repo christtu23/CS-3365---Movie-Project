@@ -28,7 +28,9 @@
             <div class="inner filter-inner">
                 <div class="filter-controls">
                     <input type="text" id="movie-search" placeholder="Search for movies..." />
-                    <input type="date" id="date-filter" />
+                    <input type="date" id="start-date" placeholder="Start date" />
+                    <input type="date" id="end-date" placeholder="End date" />
+                    <button id="apply-filters">Apply Filters</button>
                 </div>
             </div>
         </section>
@@ -49,47 +51,287 @@
         </div>
     </footer>
 
+    <!-- Booking Modal -->
+    <div id="booking-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" id="close-modal">&times;</span>
+            <h3>Book a Seat</h3>
+            <div id="seat-selection-container"></div> <!-- This will hold seat options -->
+            <button id="confirm-booking" class="button">Confirm Booking</button>
+        </div>
+    </div>
+
     <script type="module">
-        // Initialize app and fetch movies
-        import { getMovies, getShowtimesByMovieAndDate } from './assets/js/api.js';
+        import { getMovies, getShowtimesByMovieAndDate, makeRequest } from './assets/js/api.js';
 
         async function fetchMovies() {
-            const movies = await getMovies();
-            console.log(movies);
+            const searchQuery = document.getElementById('movie-search').value.trim().toLowerCase();
+            const startDate = document.getElementById('start-date').value;
+            const endDate = document.getElementById('end-date').value;
+
+            // Fetch all showtimes
+            const showtimes = await fetchShowtimes(startDate, endDate);
+
+            // Group showtimes by movie ID
+            const showtimesByMovie = groupShowtimesByMovie(showtimes);
+            console.log(showtimesByMovie)
+
+            // Fetch movies
+            const allMovies = await getMovies();
+            // Filter movies by search query (if provided)
+            let filteredMovies = Object.values(allMovies.movies);
+            if (searchQuery) {
+                filteredMovies = Object.values(allMovies.movies).filter(movie =>
+                    movie.title.toLowerCase().includes(searchQuery)
+                );
+            }
+
+            // Render movies and their associated showtimes
+            renderMovies(filteredMovies, showtimesByMovie);
+        }
+
+        async function fetchShowtimes(startDate, endDate) {
+            const filters = {};
+            if (startDate) filters.startDate = new Date(startDate).toISOString();
+            if (endDate) filters.endDate = new Date(endDate).toISOString();
+
+            // Send request to fetch filtered showtimes
+            let showtimes = await makeRequest(`/showtimes`, "GET");
+            console.log(showtimes)
+        
+            // Apply additional filtering based on date range (if provided)
+            if (startDate && endDate) {
+                console.log('Initial Showtimes:', showtimes);
+                showtimes = filterShowtimesByDateRange(showtimes, startDate, endDate);
+                console.log('Filtered Showtimes:', showtimes);
+            }
+
+            //Debuging why my showtimes arn't showing up in movie element
+            console.log('Fetched Showtimes:', showtimes)
+            if (!showtimes || showtimes.length === 0) {
+                console.log('No showtimes returned for the given date range');
+            }
+            return  showtimes
+            
+        }
+
+        function filterShowtimesByDateRange(showtimes, startDate, endDate) {
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            end.setHours(23, 59, 59, 999);  // Ensure we include the entire end day
+
+
+            return showtimes.filter(showtime => {
+                const firstShowDate = showtime.showDates[0]?.date; // Access the first date in the showDates array
+                const showtimeDate = new Date(firstShowDate);
+                console.log(showtime)
+                console.log(showtimeDate)
+                return showtimeDate >= start && showtimeDate <= end;
+            });
+        }
+
+        function groupShowtimesByMovie(showtimes) {
+            return showtimes.reduce((acc, showtime) => {
+                const movie = showtime.movie
+                if(!movie){
+                    return acc
+                }
+                const movieId = movie._id
+                if (!movieId) {
+                    return acc;
+                }
+        
+                if (!acc[movieId]) {
+                    acc[movieId] = [];
+                }
+        
+                // Flatten showDates and times into individual showtime objects
+                showtime.showDates.forEach(dateEntry => {
+                    const date = new Date(dateEntry.date).toISOString().split('T')[0]; // Extract only the date part
+                    dateEntry.times.forEach(timeEntry => {
+                        acc[movieId].push({
+                            date: date,
+                            startTime: timeEntry.startTime,
+                            endTime: timeEntry.endTime
+                        });
+                    });
+                });
+        
+                return acc;
+            }, {});
+        }
+
+        function renderMovies(movies, showtimesByMovie) {
             const moviesContainer = document.getElementById('movies');
             moviesContainer.innerHTML = '';
-            movies.movies.forEach(movie => {
-				console.log(movie._id)
+            movies.forEach(movie => {
                 const movieElement = document.createElement('div');
-                const movieImage = `assets/css/images/${movie.title}.jpeg` || `assets/css/images/${movie.title}.png`
                 movieElement.classList.add('movie-card');
+                
                 movieElement.innerHTML = `
-                    <a href="movie.html?id=${movie._id}">
-                    <img src="${movieImage}" alt="${movie.title}" />
-                    </a>
+                    <img src="/assets/css/images/${movie.title}.jpeg" alt="${movie.title}" class="movie-poster" />
                     <h4>${movie.title}</h4>
-                    <button class="view-showtimes" data-movie-id="${movie._id}">View Showtimes</button>
                 `;
+
+                // Render showtimes for the movie
+                const showtimesContainer = document.createElement('div');
+                showtimesContainer.classList.add('showtimes-container');
+
+                const showtimes = showtimesByMovie[movie._id] || [];
+                if (showtimes.length === 0) {
+                    showtimesContainer.innerHTML = `<p>No showtimes available</p>`;
+                }
+
+                showtimes.forEach(showtime => {
+                    const formattedDate = formatShowtimeDate(showtime.date);
+                    const formattedTime = formatShowtimeTime(showtime.startTime);
+                    const showtimeButton = document.createElement('button');
+                    showtimeButton.classList.add('showtime-button');
+                    showtimeButton.textContent = `${formattedDate} @ ${formattedTime}`;
+                    
+                    showtimeButton.addEventListener('click', async () => {
+                        await showSeatBookingModal(movie._id, showtime.date, showtime.startTime);
+                    });
+                    
+                    showtimesContainer.appendChild(showtimeButton);
+                });
+
+                movieElement.appendChild(showtimesContainer);
                 moviesContainer.appendChild(movieElement);
             });
+        }
 
-            // Attach event listeners to view showtimes buttons
-            document.querySelectorAll('.view-showtimes').forEach(button => {
-                button.addEventListener('click', (e) => {
-                    const movieId = e.target.getAttribute('data-movie-id');
-                    viewShowtimes(movieId);
+        document.getElementById('apply-filters').addEventListener('click', fetchMovies);
+
+        //-------------------------------[UTIL FUNCTIONS]
+        // Function to format date as "Ex.Monday 16th"
+        function formatShowtimeDate(dateString) {
+            const date = new Date(dateString);
+            const options = { weekday: 'long', day: 'numeric' };
+            let formattedDate = date.toLocaleDateString('en-US', options);
+            
+            const day = date.getDate();
+            if (day === 1 || day === 21 || day === 31) {
+                formattedDate = formattedDate.replace(day, day + 'st');
+            } else if (day === 2 || day === 22) {
+                formattedDate = formattedDate.replace(day, day + 'nd');
+            } else if (day === 3 || day === 23) {
+                formattedDate = formattedDate.replace(day, day + 'rd');
+            } else {
+                formattedDate = formattedDate.replace(day, day + 'th');
+            }
+            
+            return formattedDate;
+        }
+
+        // Function to format time as "Ex.8PM"
+        function formatShowtimeTime(timeString) {
+            const hours = parseInt(timeString.split(":")[0], 10);
+            const minutes = timeString.split(":")[1];
+            const period = hours >= 12 ? 'PM' : 'AM';
+            const formattedHours = hours > 12 ? hours - 12 : (hours === 0 ? 12 : hours); // Convert to 12-hour format
+
+            return `${formattedHours}:${minutes} ${period}`;
+        }
+        
+        //Logic For Booking
+        async function showSeatBookingModal(movieId, showtimeDate, startTime) {
+            const modal = document.getElementById('booking-modal');
+            const seatSelectionContainer = document.getElementById('seat-selection-container');
+            
+            // Clear any previous seat options
+            seatSelectionContainer.innerHTML = '';
+        
+            // Fetch available seats for the selected movie and showtime
+            const availableSeats = await fetchAvailableSeats(movieId, showtimeDate, startTime);
+            
+            // Render seat options in the modal
+            availableSeats.forEach(seat => {
+                const seatButton = document.createElement('button');
+                seatButton.classList.add('seat-button');
+                seatButton.textContent = `Seat ${seat.seatNumber}`;
+                seatButton.disabled = !seat.isAvailable; // Disable if not available
+        
+                // Handle seat selection
+                seatButton.addEventListener('click', () => {
+                    seatButton.classList.toggle('selected');
                 });
+        
+                seatSelectionContainer.appendChild(seatButton);
+            });
+        
+            // Open the modal
+            modal.style.display = 'block';
+        
+            // Handle closing of the modal
+            const closeModal = document.getElementById('close-modal');
+            closeModal.addEventListener('click', () => {
+                modal.style.display = 'none';
+            });
+        
+            // Handle confirmation of booking
+            const confirmButton = document.getElementById('confirm-booking');
+            confirmButton.addEventListener('click', async () => {
+                const selectedSeats = Array.from(seatSelectionContainer.querySelectorAll('.seat-button.selected'))
+                    .map(button => button.textContent.replace('Seat ', ''));
+        
+                if (selectedSeats.length > 0) {
+                    // Make the booking request for selected seats
+                    await bookSeats(movieId, showtimeDate, startTime, selectedSeats);
+        
+                    // Close the modal after booking
+                    modal.style.display = 'none';
+
+                } else {
+                    alert('Please select at least one seat!');
+                }
             });
         }
-
-        // Show showtimes when a movie is selected
-        async function viewShowtimes(movieId) {
-            const date = document.getElementById('date-filter').value;
-            const showtimes = await getShowtimesByMovieAndDate(movieId, date);
-			console.log(showtimes);
-            alert(`Showtimes for movie: ${showtimes.map(s => s.time).join(', ')}`);
+        
+        // Fetch available seats for the selected movie and showtime
+        async function fetchAvailableSeats(movieId, showtimeDate, startTime) {
+            // Send an API request to fetch available seats for the selected movie and showtime
+            const response = await fetch(`http://localhost:5000/api/seats?movieId=${movieId}&showtimeDate=${showtimeDate}&startTime=${startTime}`);
+            const data = await response.json();
+            return data.seats;
         }
+        
+        // Book selected seats
+        async function bookSeats(movieId, showtimeDate, startTime, selectedSeats) {
+            const userId = localStorage.getItem('userId'); // Assuming userId is stored in localStorage after login
 
+            if (!userId) {
+                alert("User not logged in!");
+                return;
+            }
+
+            const bookingData = {
+                movieId,
+                showtimeDate,
+                startTime,
+                seats: selectedSeats,
+                userId, // Include the userId in the request body
+            };
+
+            // Send the booking request
+            const response = await fetch('http://localhost:5000/api/user/book', 
+                {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('authToken')}`, // JWT token for authentication
+                },
+                body: JSON.stringify(bookingData),
+                });
+                    const result = await response.json();
+                    if (response.ok) {
+                        console.log('Booking successful:', result);
+                    } else {
+                        console.error('Booking failed:', result);
+                    }
+                }
+
+        // Initial fetch to display all movies and showtimes
         fetchMovies();
     </script>
 </body>

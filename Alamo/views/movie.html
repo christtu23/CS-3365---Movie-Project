@@ -1,10 +1,11 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-    <title>Movie Details | Ticket Master</title>
+    <title>Movies | Ticket Master</title>
     <link rel="stylesheet" href="assets/css/style.css" />
 </head>
 <body>
+    <!-- Header -->
     <header class="movie-header">
         <div class="header-inner">
             <a href="home.html">
@@ -12,61 +13,69 @@
             </a>
             <nav>
                 <ul class="nav-menu">
-                    <li><a href="movies.html">Movies</a></li>
+                    <li><a href="movies.html">Location</a></li>
                     <li><a href="login.html">Account</a></li>
+                    <li><a href="about.html">About</a></li>
                 </ul>
             </nav>
         </div>
     </header>
 
+    <!-- Wrapper -->
     <div id="wrapper">
-        <!-- Movie Details Section -->
-        <section class="movie-section">
-            <div class="movie-container">
-                <h2 id="movie-title">Movie Title</h2>
-                <p id="movie-description">Movie description goes here.</p>
-                <h3>Showtimes</h3>
-                <div id="showtimes"></div>
-                <button id="book-button" onclick="bookTicket()">Book Ticket</button>
+        <!-- Filter Section -->
+        <section id="filter-section" class="wrapper">
+            <div class="inner filter-inner">
+                <div class="filter-controls">
+                    <input type="text" id="movie-search" placeholder="Search for movies..." />
+                    <input type="date" id="date-filter" />
+                </div>
+            </div>
+        </section>
+
+        <!-- Movies Section -->
+        <section id="movies-section" class="featured">
+            <div class="inner">
+                <h3>Movies Now Playing</h3>
+                <div id="movies" class="movies"></div>
             </div>
         </section>
     </div>
 
     <!-- Footer -->
-    <footer id="footer" class="wrapper style1-alt">
+    <footer id="footer">
         <div class="inner">
             <br>Text
         </div>
     </footer>
 
+    <script type="module" src="assets/js/app.js"></script>
     <script type="module">
-        import { getMovieDetails, bookMovieTicket } from './api.js';
+        import { getMovies, getShowtimesByMovieAndDate, makeRequest } from './assets/js/api.js';
 
-        async function fetchMovieDetails(movieId) {
-            const movie = await getMovieDetails(movieId);
-            document.getElementById('movie-title').textContent = movie.title;
-            document.getElementById('movie-description').textContent = movie.description;
-            const showtimesContainer = document.getElementById('showtimes');
-            showtimesContainer.innerHTML = '';
-            movie.showtimes.forEach(showtime => {
-                const showtimeElement = document.createElement('button');
-                showtimeElement.textContent = showtime;
-                showtimesContainer.appendChild(showtimeElement);
+        // Fetch movies and display them
+        async function fetchMovies() {
+            const movies = await getMovies();
+            const moviesContainer = document.getElementById('movies');
+            moviesContainer.innerHTML = '';
+            movies.movies.forEach(movie => {
+                const movieElement = document.createElement('div');
+                movieElement.classList.add('movie-card');
+                movieElement.innerHTML = `
+                    <h4>${movie.title}</h4>
+                    <button onclick="viewShowtimes(${movie.id})">View Showtimes</button>
+                `;
+                moviesContainer.appendChild(movieElement);
             });
         }
 
-        function bookTicket() {
-            const selectedShowtime = document.querySelector('#showtimes button.selected');
-            if (!selectedShowtime) {
-                alert('Please select a showtime.');
-                return;
-            }
-            const movieId = 1; // Replace with dynamic movie ID
-            const showtime = selectedShowtime.textContent;
-            bookMovieTicket({ movieId, showtime });
+        async function viewShowtimes(movieId) {
+            const date = document.getElementById('date-filter').value;
+            const showtimes = await getShowtimesByMovieAndDate(movieId, date);
+            alert(`Showtimes for movie: ${showtimes.map(s => s.time).join(', ')}`);
         }
 
-        fetchMovieDetails(1); // Replace with dynamic movie ID
+        fetchMovies();
     </script>
 </body>
 </html>
